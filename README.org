@@ -1,0 +1,72 @@
+[[https://travis-ci.org/threatgrid/ring-jwt-middleware][https://travis-ci.org/threatgrid/ring-api-key-middleware.png?branch=master]]
+
+* =ring-api-key-middleware=
+
+A simple middleware to authenticate users using API Key
+
+** Features
+
+- the function to check the validity of API Key should be provided and not part
+  of this middleware.
+
+** Usage
+
+*** Middleware & options
+
+Use =wrap-api-key-auth-fn= to create an instance of the middleware,
+wrap your routes with it:
+
+#+BEGIN_SRC clojure
+(defn get-auth-from-api-key [token]
+    (when (= token "secret-api-key")
+         {:user "user-01"
+          :groups ["admin-id" "user-id"]
+          :username "username"
+          :group-names ["admin" "users"]
+          :admin true
+          :auth-type :api-key}))
+(def app
+     (wrap-api-key-auth-fn handler get-auth-from-api-key))
+#+END_SRC
+
+When configured like this all requests with the header:
+
+#+BEGIN_SRC
+Authorization: apiKey secret-api-key
+#+END_SRC
+
+will be modified to be passed to the handler with the new key `:api-key-info`
+containing:
+
+#+BEGIN_SRC clojure
+{:user "user-01"
+ :groups ["admin-id" "user-id"]
+ :username "username"
+ :group-names ["admin" "users"]
+ :admin true}
+#+END_SRC
+
+If the header contain an Authorization header with an unknown `api-key` the
+request will be rejected with a 403.
+
+#+BEGIN_SRC
+Authorization: apiKey unknown-api-key
+#+END_SRC
+
+If the header contain something with another authorization kind or no
+authorization header like:
+
+#+BEGIN_SRC
+Authorization: Bearer something-else
+#+END_SRC
+
+Then the request will be passed to the handler without any `api-key-info`. This
+provide the ability for other authentication middleware to be used. Deciding
+what to do about authenticated or non-authenticated user is left for another
+middleware or to be handled by the app handler.
+
+
+** License
+
+Copyright © 2015-2017 Cisco Systems
+Eclipse Public License v1.0
