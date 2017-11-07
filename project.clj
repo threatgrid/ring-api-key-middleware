@@ -1,4 +1,4 @@
-(defproject threatgrid/ring-api-key-middleware "0.1.1-SNAPSHOT"
+(defproject threatgrid/ring-api-key-middleware "0.1.2"
   :description "A simple middleware to deal with API keys Authentication"
   :url "http://github.com/threatgrid/ring-api-key-middleware"
   :license {:name "Eclipse Public License - v 1.0"

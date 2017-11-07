@@ -18,10 +18,12 @@
 
 (defn wrap-api-key-fn
   "I check "
-  [handler get-infos]
-  (fn [request]
-    (if-let [api-key (get-api-key request)]
-      (if-let [infos (get-infos api-key)]
-        (handler (assoc request :api-key-infos infos))
-        (unauthorized "wrong access key"))
-      (handler request))))
+  [get-infos]
+  (fn
+    [handler]
+    (fn [request]
+      (if-let [api-key (get-api-key request)]
+        (if-let [infos (get-infos api-key)]
+          (handler (assoc request :api-key-infos infos))
+          (unauthorized "wrong access key"))
+        (handler request)))))

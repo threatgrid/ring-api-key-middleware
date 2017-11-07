@@ -19,14 +19,13 @@ wrap your routes with it:
 #+BEGIN_SRC clojure
 (defn get-auth-from-api-key [token]
     (when (= token "secret-api-key")
-         {:user "user-01"
-          :groups ["admin-id" "user-id"]
-          :username "username"
-          :group-names ["admin" "users"]
-          :admin true
-          :auth-type :api-key}))
+      {:user {:id "user-01" :name "username"}
+       :groups #{{:id "cisco" :name "Cisco"}}
+       :roles #{:admin :user}
+       :auth-type :api-key}))
+
 (def app
-     (wrap-api-key-auth-fn handler get-auth-from-api-key))
+     ((wrap-api-key-auth-fn get-auth-from-api-key) handler))
 #+END_SRC
 
 When configured like this all requests with the header:
@@ -39,11 +38,10 @@ will be modified to be passed to the handler with the new key `:api-key-info`
 containing:
 
 #+BEGIN_SRC clojure
-{:user "user-01"
- :groups ["admin-id" "user-id"]
- :username "username"
- :group-names ["admin" "users"]
- :admin true}
+{:user {:id "user-01" :name "username"}
+ :groups #{{:id "cisco" :name "Cisco"}}
+ :roles #{:admin :user}
+ :auth-type :api-key}
 #+END_SRC
 
 If the header contain an Authorization header with an unknown `api-key` the
